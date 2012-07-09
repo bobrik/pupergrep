@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Pupergrep</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <link href="css/bootstrap.css" rel="stylesheet">
+        <style type="text/css">
+            body {
+                padding-top: 60px;
+                padding-bottom: 40px;
+            }
+            .sidebar-nav {
+                padding: 9px 0;
+            }
+
+            .pupergrep-settings-form input {
+                width: 170px;
+            }
+        </style>
+        <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div class="navbar navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container-fluid">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="#">PuperGrep</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span3">
+                    <div class="well sidebar-nav">
+                        <div class="nav-list form-horizontal pupergrep-settings-form">
+                            <h3>Settings</h3>
+                            <div class="control-group">
+                                <input type="text" id="buffer-length" value="200" />
+                                <span class="help-inline">buffer lines</span>
+                            </div>
+                            <div class="control-group">
+                                <input type="text" id="highlight-items" placeholder="^web" />
+                                <span class="help-inline">highlight lines</span>
+                            </div>
+                            <!--
+                            <div class="control-group">
+                                <input type="text" id="filter-items" placeholder="INFO" />
+                                <span class="help-inline">filter lines</span>
+                            </div>
+                            -->
+                            <div class="control-group">
+                                <input type="text" id="grep-items" placeholder="^web" />
+                                <span class="help-inline">grep lines</span>
+                            </div>
+                            <button class="btn btn-info" id="pause-button" data-paused="0">
+                                <i id="pause-icon" class="icon-pause"></i>
+                                <span id="pause-text">Pause</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="well sidebar-nav">
+                        <ul class="nav nav-list" id="logs-list">
+                            <li class="nav-header">Logs</li>
+                            <li>
+                                <input type="text" id="log-name-filter" placeholder="Filter logs by name regexp.." />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="span9">
+                    <table class="table table-bordered table-striped" id="log-lines">
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="/js/jquery.js"></script>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            jQuery(document).ready(function() {
+                var logLinesTable     = jQuery("#log-lines"),
+                    logsListContainer = jQuery("#logs-list"),
+                    logsList          = jQuery(),
+                    pauseButton       = jQuery("#pause-button"),
+                    logNameFilter     = jQuery("#log-name-filter"),
+                    currentLog        = undefined,
+                    bufferLength      = 200,
+                    outputPaused      = false;
+
+                pauseButton.click(function() {
+                    var pauseIcon = jQuery("#pause-icon"),
+                        pauseText = jQuery("#pause-text");
+
+                    if (!outputPaused) {
+                        pauseIcon.removeClass("icon-pause");
+                        pauseIcon.addClass("icon-play");
+                        pauseText.text("Resume");
+                        outputPaused = true;
+                        addLogLine("Output paused");
+                    } else {
+                        pauseIcon.removeClass("icon-play");
+                        pauseIcon.addClass("icon-pause");
+                        pauseText.text("Pause");
+                        outputPaused = false;
+                        addLogLine("Output resumed");
+                    }
+                });
+
+                jQuery("#buffer-length").change(function() {
+                    var self  = jQuery(this),
+                        value = parseInt(self.val());
+
+                    if (isNaN(value) || value <= 0) {
+                        self.parent().parent().addClass("error");
+                    } else {
+                        bufferLength = value;
+                        self.parent().parent().removeClass("error");
+                    }
+                });
+
+                logNameFilter.keyup(function() {
+                    logNameFilter.change();
+                });
+
+                logNameFilter.change(function() {
+                    try {
+                        var regexp = new RegExp(logNameFilter.val());
+                        logsList.each(function(index, node) {
+                            // slow piece of shit
+                            var element = jQuery(node);
+                            if (element.data("log-name").match(regexp)) {
+                                if (element.is(':hidden')) {
+                                    element.show()
+                                }
+                            } else {
+                                if (!element.is(":hidden")) {
+                                    element.hide();
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.log(e);
+                    }
+                });
+
+                logsListContainer.delegate("li.log", "click", function() {
+                    var element = jQuery(this);
+
+                    logLinesTable.find("tr.log-line").remove();
+                    logsListContainer.children("li.log").removeClass("active");
+
+                    element.addClass("active");
+                    socket.emit("subscribe", {
+                        name: element.data("log-name")
+                    });
+                });
+
+                (function initFromURI() {
+                    function getURLParameter(name) {
+                        var value = (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
+                        return value !== null ? decodeURI(value) : value;
+                    }
+
+                    var buffer     = getURLParameter("buffer"),
+                        log        = getURLParameter("log"),
+                        highlight  = getURLParameter("highlight"),
+                        grep       = getURLParameter("grep"),
+                        nameFilter = getURLParameter("name-filter");
+
+                    if (buffer) {
+                        jQuery("#buffer-length").val(buffer).change();
+                    }
+                    if (highlight) {
+                        jQuery("#highlight-items").val(highlight).change();
+                    }
+                    if (grep) {
+                        jQuery("#grep-items").val(grep).change();
+                    }
+                    if (nameFilter) {
+                        jQuery("#log-name-filter").val(nameFilter).change();
+                    }
+                    if (log) {
+                        currentLog = log;
+                    }
+                })();
+
+                var socket = io.connect(document.location.hostname, {
+                    transports: ['xhr-polling'] // bad, bad nginx!
+                });
+
+                socket.on("logs", function(data) {
+                    var selectLog;
+
+                    logsListContainer.children(".log").remove();
+
+                    jQuery(data.logs).each(function(index, name) {
+                        var container = jQuery("<li>"),
+                            log       = jQuery("<a>");
+
+                        log.text(name);
+                        container.data("log-name", name);
+                        container.addClass("log");
+                        container.append(log);
+
+                        logsListContainer.append(container);
+
+                        if (name == currentLog) {
+                            selectLog = container;
+                        }
+                    });
+
+                    if (selectLog) {
+                        selectLog.click();
+                    }
+
+                    logsList = logsListContainer.children("li.log");
+                    logNameFilter.change();
+                });
+
+                function addLogLine(text, isRaw) {
+                    var lines,
+                        container,
+                        line;
+
+                    container = jQuery("<tr>");
+                    line      = jQuery("<td>");
+
+                    line.text(text);
+
+                    if (isGrepEnabled()) {
+                        if (!isGrepAcceptedLine(text)) {
+                            return;
+                        }
+                    }
+
+                    if (isHighlightedLine(text)) {
+                        container.addClass("alert");
+                    }
+
+                    container.addClass("log-line");
+                    container.append(line);
+
+                    logLinesTable.append(container);
+
+                    while (true) {
+                        lines = logLinesTable.find("tr.log-line");
+                        if (lines.length > bufferLength) {
+                            lines.first().remove();
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                function isHighlightedLine(text) {
+                    var highlight = jQuery("#highlight-items").val();
+                    try {
+                        if (highlight && text.match(new RegExp(highlight))) {
+                            return true;
+                        }
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+                    return false;
+                }
+
+                function isGrepEnabled() {
+                    return !!jQuery("#grep-items").val()
+                }
+
+                function isGrepAcceptedLine(text) {
+                    var grep = jQuery("#grep-items").val();
+                    try {
+                        if (grep && text.match(new RegExp(grep))) {
+                            return true;
+                        }
+                    } catch (e) {
+                        console.log(e);
+                    }
+
+                    return false;
+                }
+
+
+                socket.on("line", function(data) {
+                    if (outputPaused) {
+                        return;
+                    }
+
+                    addLogLine(data.line);
+                });
+
+                socket.on("disconnect", function() {
+                    console.log("got disconnect!");
+                });
+
+                socket.on("connect", function() {
+//                    socket.emit("subscribe", {path: "/tmp/pew"});
+                    console.log("connected!");
+                });
+            });
+        </script>
+    </body>
+</html>
