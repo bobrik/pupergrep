@@ -4,15 +4,20 @@
 
 Everybody loves screenshots!
 
-![screenshot](http://bobrik.name/uploads/pupergrep-screenshot.png)
+![screenshot](http://bobrik.name/uploads/pupergrep-new-screenshot.png)
 
 * Grep only lines you like (skip non-fatal errors, stack traces, INFO lines).
 * Highlight only lines you dislike (FATAL errors, long responses).
 * Limit output buffer to keep the whole log area on the screen or make it large to see everthing.
 * Pause log to take a look for fun facts in your error log.
 * Fast switching between many logs with handsome list with search box.
+* Font-size switching for eagles.
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Open-source. Can you imagine that?
+
+## Demo
+
+Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/). Feel free to touch it before using!
 
 ## Installation
 
