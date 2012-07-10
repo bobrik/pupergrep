@@ -56,6 +56,14 @@
                                 <input type="text" id="grep-items" placeholder="^web" />
                                 <span class="help-inline">grep lines</span>
                             </div>
+                            <div class="control-group">
+                                <div class="input-append">
+                                    <input type="text" id="font-size" value="13" disabled="disabled">
+                                    <button class="btn" id="font-size-bigger">+</button>
+                                    <button class="btn" id="font-size-smaller">-</button>
+                                    <span class="help-inline">px</span>
+                                </div>
+                            </div>
                             <button class="btn btn-info" id="pause-button" data-paused="0">
                                 <i id="pause-icon" class="icon-pause"></i>
                                 <span id="pause-text">Pause</span>
@@ -89,6 +97,7 @@
                     logsList          = jQuery(),
                     pauseButton       = jQuery("#pause-button"),
                     logNameFilter     = jQuery("#log-name-filter"),
+                    fontSizeSelector  = jQuery("#font-size"),
                     currentLog        = undefined,
                     bufferLength      = 200,
                     outputPaused      = false;
@@ -122,6 +131,24 @@
                         bufferLength = value;
                         self.parent().parent().removeClass("error");
                     }
+                });
+
+                fontSizeSelector.change(function() {
+                    var fontSize = fontSizeSelector.val();
+                    if (fontSize >= 8 && fontSize <= 20) {
+                        logLinesTable.css("font-size", fontSize + "px");
+                        fontSizeSelector.parent().parent().removeClass("error");
+                    } else {
+                        fontSizeSelector.parent().parent().addClass("error");
+                    }
+                });
+
+                jQuery("#font-size-bigger").click(function() {
+                    fontSizeSelector.val(+fontSizeSelector.val() + 1).change();
+                });
+
+                jQuery("#font-size-smaller").click(function() {
+                    fontSizeSelector.val(+fontSizeSelector.val() - 1).change();
                 });
 
                 logNameFilter.keyup(function() {
@@ -171,7 +198,8 @@
                         log        = getURLParameter("log"),
                         highlight  = getURLParameter("highlight"),
                         grep       = getURLParameter("grep"),
-                        nameFilter = getURLParameter("name-filter");
+                        nameFilter = getURLParameter("name-filter"),
+                        fontSize   = getURLParameter("font-size");
 
                     if (buffer) {
                         jQuery("#buffer-length").val(buffer).change();
@@ -184,6 +212,9 @@
                     }
                     if (nameFilter) {
                         jQuery("#log-name-filter").val(nameFilter).change();
+                    }
+                    if (fontSize) {
+                        fontSizeSelector.val(fontSize).change();
                     }
                     if (log) {
                         currentLog = log;
