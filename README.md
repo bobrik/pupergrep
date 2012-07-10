@@ -17,7 +17,9 @@ Everybody loves screenshots!
 
 ## Demo
 
-Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/). Feel free to touch it before using!
+Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/).=
+
+Select log you like and try to push some buttons.
 
 ## Installation
 
