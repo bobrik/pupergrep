@@ -28,6 +28,7 @@ This is pretty simple, believe me!
 ```
 mkdir ~/mypupergrep
 cd ~/mypupergrep
+mkdir node_modules
 npm install pupergrep
 ```
 
