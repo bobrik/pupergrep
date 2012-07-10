@@ -17,7 +17,7 @@ Everybody loves screenshots!
 
 ## Demo
 
-Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/).=
+Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/).
 
 Select log you like and try to push some buttons.
 
