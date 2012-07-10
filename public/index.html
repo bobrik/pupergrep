@@ -70,6 +70,13 @@
                             </button>
                         </div>
                     </div>
+                    <div>
+                        <ul class="nav nav-pills nav-stacked">
+                            <li>
+                                <a id="current-link" href="/">Current log link (copy to share or bookmark)</a>
+                            </li>
+                        </ul>
+                    </div>
                     <div class="well sidebar-nav">
                         <ul class="nav nav-list" id="logs-list">
                             <li class="nav-header">Logs</li>
@@ -98,6 +105,7 @@
                     pauseButton       = jQuery("#pause-button"),
                     logNameFilter     = jQuery("#log-name-filter"),
                     fontSizeSelector  = jQuery("#font-size"),
+                    currentLink       = jQuery("#current-link"),
                     currentLog        = undefined,
                     bufferLength      = 200,
                     outputPaused      = false;
@@ -121,6 +129,22 @@
                     }
                 });
 
+                function rebuildCurrentLink() {
+                    var url = "/?";
+
+                    if (currentLog) {
+                        url += "&log=" + currentLog;
+                    }
+
+                    url += "&buffer=" + encodeURIComponent(jQuery("#buffer-length").val());
+                    url += "&highlight=" + encodeURIComponent(jQuery("#highlight-items").val());
+                    url += "&grep=" + encodeURIComponent(jQuery("#grep-items").val());
+                    url += "&name-filter=" + encodeURIComponent(jQuery("#log-name-filter").val());
+                    url += "&font-size=" + fontSizeSelector.val();
+
+                    currentLink.prop("href", url);
+                }
+
                 jQuery("#buffer-length").change(function() {
                     var self  = jQuery(this),
                         value = parseInt(self.val());
@@ -131,6 +155,8 @@
                         bufferLength = value;
                         self.parent().parent().removeClass("error");
                     }
+
+                    rebuildCurrentLink();
                 });
 
                 fontSizeSelector.change(function() {
@@ -141,6 +167,8 @@
                     } else {
                         fontSizeSelector.parent().parent().addClass("error");
                     }
+
+                    rebuildCurrentLink();
                 });
 
                 jQuery("#font-size-bigger").click(function() {
@@ -149,6 +177,10 @@
 
                 jQuery("#font-size-smaller").click(function() {
                     fontSizeSelector.val(+fontSizeSelector.val() - 1).change();
+                });
+
+                jQuery("#highlight-items, #grep-items").change(function() {
+                    rebuildCurrentLink();
                 });
 
                 logNameFilter.keyup(function() {
@@ -174,6 +206,8 @@
                     } catch (e) {
                         console.log(e);
                     }
+
+                    rebuildCurrentLink();
                 });
 
                 logsListContainer.delegate("li.log", "click", function() {
@@ -186,11 +220,15 @@
                     socket.emit("subscribe", {
                         name: element.data("log-name")
                     });
+
+                    currentLog = element.data("log-name");
+
+                    rebuildCurrentLink();
                 });
 
                 (function initFromURI() {
                     function getURLParameter(name) {
-                        var value = (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1];
+                        var value = (RegExp(name + '=' + '(.*?)(&|$)').exec(location.search)||[,null])[1];
                         return value !== null ? decodeURI(value) : value;
                     }
 
@@ -252,6 +290,8 @@
 
                     logsList = logsListContainer.children("li.log");
                     logNameFilter.change();
+
+                    rebuildCurrentLink();
                 });
 
                 function addLogLine(text, isRaw) {
