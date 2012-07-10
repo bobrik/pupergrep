@@ -52,12 +52,6 @@
                                 <input type="text" id="highlight-items" placeholder="^web" />
                                 <span class="help-inline">highlight lines</span>
                             </div>
-                            <!--
-                            <div class="control-group">
-                                <input type="text" id="filter-items" placeholder="INFO" />
-                                <span class="help-inline">filter lines</span>
-                            </div>
-                            -->
                             <div class="control-group">
                                 <input type="text" id="grep-items" placeholder="^web" />
                                 <span class="help-inline">grep lines</span>
@@ -136,7 +130,7 @@
 
                 logNameFilter.change(function() {
                     try {
-                        var regexp = new RegExp(logNameFilter.val());
+                        var regexp = new RegExp(logNameFilter.val(), "i");
                         logsList.each(function(index, node) {
                             // slow piece of shit
                             var element = jQuery(node);
