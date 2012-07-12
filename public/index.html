@@ -136,15 +136,15 @@
                 function rebuildCurrentLink() {
                     var url = "/?";
 
-                    if (currentLog) {
-                        url += "&log=" + currentLog;
-                    }
-
                     url += "&buffer=" + encodeURIComponent(jQuery("#buffer-length").val());
                     url += "&highlight=" + encodeURIComponent(jQuery("#highlight-items").val());
                     url += "&grep=" + encodeURIComponent(jQuery("#grep-items").val());
                     url += "&name-filter=" + encodeURIComponent(jQuery("#log-name-filter").val());
                     url += "&font-size=" + fontSizeSelector.val();
+
+                    if (currentLog) {
+                        url += "&log=" + currentLog;
+                    }
 
                     currentLink.prop("href", url);
                 }
