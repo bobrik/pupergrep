@@ -136,7 +136,7 @@
                 function rebuildCurrentLink() {
                     var url = "/?";
 
-                    url += "&buffer=" + encodeURIComponent(jQuery("#buffer-length").val());
+                    url += "buffer=" + encodeURIComponent(jQuery("#buffer-length").val());
                     url += "&highlight=" + encodeURIComponent(jQuery("#highlight-items").val());
                     url += "&grep=" + encodeURIComponent(jQuery("#grep-items").val());
                     url += "&name-filter=" + encodeURIComponent(jQuery("#log-name-filter").val());
