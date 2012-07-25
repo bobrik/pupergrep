@@ -372,7 +372,7 @@
 
                 function isGrepEnabled() {
                     var value = jQuery("#grep-items").data('tags');
-                    return !!value && value.length;
+                    return !!(value && value.length);
                 }
 
                 function isGrepAcceptedLine(text) {
