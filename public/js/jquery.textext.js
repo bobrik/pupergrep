@@ -1081,8 +1081,12 @@
 			data = self.getWeightedEventResponse(EVENT_GET_FORM_DATA, keyCode || 0)
 			;
 
-		self.trigger(EVENT_SET_FORM_DATA  , data['form']);
-		self.trigger(EVENT_SET_INPUT_DATA , data['input']);
+        switch (keyCode) {
+            case 37: case 38: case 39: case 40: break;
+            default:
+                self.trigger(EVENT_SET_FORM_DATA  , data['form']);
+                self.trigger(EVENT_SET_INPUT_DATA , data['input']);
+        }
 	};
 
 	//--------------------------------------------------------------------------------
@@ -2329,7 +2333,7 @@
   margin: 0;\
   padding: 5px;\
   white-space: nowrap;\
-  font: 11px "lucida grande", tahoma, verdana, arial, sans-serif;\
+  font: 13px "lucida grande", tahoma, verdana, arial, sans-serif;\
   line-height: 13px;\
   height: auto;\
 }\

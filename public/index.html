@@ -265,7 +265,7 @@
                 (function initFromURI() {
                     function getURLParameter(name) {
                         var value = (RegExp(name + '=' + '(.*?)(&|$)').exec(location.search)||[,null])[1];
-                        return value !== null ? decodeURI(value) : value;
+                        return value !== null ? decodeURIComponent(value) : value;
                     }
 
                     var buffer     = getURLParameter("buffer"),
