@@ -18,7 +18,33 @@
             }
 
             .pupergrep-settings-form input {
-                width: 170px;
+                width: 160px;
+                height: auto;
+                -webkit-box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+            .pupergrep-settings-form input[disabled] {
+                width: 106px;
+            }
+
+            .control-group > div,
+            .control-group > span {
+                vertical-align: middle;
+            }
+
+            .text-tag,
+            .text-button {
+                float: none !important;
+            }
+            .text-button {
+                margin-right: 0 !important;
+            }
+            .text-core {
+                display: inline-block;
+            }
+            .text-tags {
+                padding: 5px !important;
             }
 
             #logs-list li.log {
@@ -62,11 +88,9 @@
                             </div>
                             <div class="control-group">
                                 <div class="input-append">
-                                    <input type="text" id="font-size" value="13" disabled="disabled">
-                                    <button class="btn" id="font-size-bigger">+</button>
-                                    <button class="btn" id="font-size-smaller">-</button>
-                                    <span class="help-inline">px</span>
+                                    <input type="text" id="font-size" value="13" disabled="disabled"><button class="btn" id="font-size-bigger">+</button><button class="btn" id="font-size-smaller">-</button>
                                 </div>
+                                <span class="help-inline">px</span>
                             </div>
                             <button class="btn btn-info" id="pause-button" data-paused="0">
                                 <i id="pause-icon" class="icon-pause"></i>
@@ -100,6 +124,7 @@
         </div>
 
         <script type="text/javascript" src="/js/jquery.js"></script>
+        <script type="text/javascript" src="/js/jquery.textext.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             jQuery(document).ready(function() {
@@ -112,7 +137,8 @@
                     currentLink       = jQuery("#current-link"),
                     currentLog        = undefined,
                     bufferLength      = 20,
-                    outputPaused      = false;
+                    outputPaused      = false,
+                    linkSeparator     = '!!!';
 
                 pauseButton.click(function() {
                     var pauseIcon = jQuery("#pause-icon"),
@@ -137,8 +163,10 @@
                     var url = "/?";
 
                     url += "buffer=" + encodeURIComponent(jQuery("#buffer-length").val());
-                    url += "&highlight=" + encodeURIComponent(jQuery("#highlight-items").val());
-                    url += "&grep=" + encodeURIComponent(jQuery("#grep-items").val());
+                    if (jQuery("#highlight-items").data('tags'))
+                        url += "&highlight=" + encodeURIComponent(jQuery("#highlight-items").data('tags').join(linkSeparator));
+                    if (jQuery("#grep-items").data('tags'))
+                        url += "&grep=" + encodeURIComponent(jQuery("#grep-items").data('tags').join(linkSeparator));
                     url += "&name-filter=" + encodeURIComponent(jQuery("#log-name-filter").val());
                     url += "&font-size=" + fontSizeSelector.val();
 
@@ -183,7 +211,11 @@
                     fontSizeSelector.val(+fontSizeSelector.val() - 1).change();
                 });
 
-                jQuery("#highlight-items, #grep-items").change(function() {
+                jQuery('#highlight-items, #grep-items').textext({ plugins : 'tags' });
+                jQuery('#highlight-items, #grep-items').textext()[0].getFormData();
+                jQuery('#highlight-items, #grep-items').bind('setFormData', function(e, data, isEmpty) {
+                    var $target = jQuery(e.target);
+                    $target.data('tags', data);
                     rebuildCurrentLink();
                 });
 
@@ -233,7 +265,7 @@
                 (function initFromURI() {
                     function getURLParameter(name) {
                         var value = (RegExp(name + '=' + '(.*?)(&|$)').exec(location.search)||[,null])[1];
-                        return value !== null ? decodeURI(value) : value;
+                        return value !== null ? decodeURIComponent(value) : value;
                     }
 
                     var buffer     = getURLParameter("buffer"),
@@ -247,10 +279,10 @@
                         jQuery("#buffer-length").val(buffer).change();
                     }
                     if (highlight) {
-                        jQuery("#highlight-items").val(highlight).change();
+                        jQuery("#highlight-items").textext()[0].tags().addTags(highlight.split(linkSeparator));
                     }
                     if (grep) {
-                        jQuery("#grep-items").val(grep).change();
+                        jQuery("#grep-items").textext()[0].tags().addTags(grep.split(linkSeparator));
                     }
                     if (nameFilter) {
                         jQuery("#log-name-filter").val(nameFilter).change();
@@ -334,10 +366,15 @@
                 }
 
                 function isHighlightedLine(text) {
-                    var highlight = jQuery("#highlight-items").val();
+                    var tags = jQuery("#highlight-items").data('tags');
                     try {
-                        if (highlight && text.match(new RegExp(highlight))) {
-                            return true;
+                        if (tags && tags.length) {
+                            for (var i in tags) {
+                                var tag = tags[i];
+                                if (tag && text.match(new RegExp(tag))) {
+                                    return true;
+                                }
+                            }
                         }
                     } catch (e) {
                         console.log(e);
@@ -347,14 +384,20 @@
                 }
 
                 function isGrepEnabled() {
-                    return !!jQuery("#grep-items").val()
+                    var value = jQuery("#grep-items").data('tags');
+                    return !!(value && value.length);
                 }
 
                 function isGrepAcceptedLine(text) {
-                    var grep = jQuery("#grep-items").val();
+                    var tags = jQuery("#grep-items").data('tags');
                     try {
-                        if (grep && text.match(new RegExp(grep))) {
-                            return true;
+                        if (tags && tags.length) {
+                            for (var i in tags) {
+                                var tag = tags[i];
+                                if (tag && text.match(new RegExp(tag))) {
+                                    return true;
+                                }
+                            }
                         }
                     } catch (e) {
                         console.log(e);
