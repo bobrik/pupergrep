@@ -2007,6 +2007,11 @@
 
 		self._paddingBox = pos;
 
+        if (lastTag.css('float') == 'none') {
+            pos.left = false;
+            pos.top += lastTag.outerHeight();
+        }
+
 		self.input().css({
 			paddingLeft : pos.left,
 			paddingTop  : pos.top
