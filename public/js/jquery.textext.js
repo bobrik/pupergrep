@@ -980,7 +980,7 @@
 
 		input.width(width);
 		wrap.width(width).height(height);
-		container.height(height);
+		container.width(width).height(height);
 
 		self.trigger(EVENT_POST_INVALIDATE);
 	};
