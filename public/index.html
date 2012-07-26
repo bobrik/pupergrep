@@ -18,11 +18,27 @@
             }
 
             .pupergrep-settings-form input {
-                width: 190px;
+                width: 248px;
                 height: auto;
                 -webkit-box-sizing: border-box;
                 -moz-box-sizing: border-box;
                 box-sizing: border-box;
+            }
+            .pupergrep-settings-form input[disabled] {
+                width: 192px;
+            }
+
+            .text-tag,
+            .text-button {
+                float: none !important;
+            }
+
+            .text-button {
+                margin-right: 0 !important;
+            }
+
+            .text-tags {
+                padding: 5px !important;
             }
 
             #logs-list li.log {
@@ -66,11 +82,9 @@
                             </div>
                             <div class="control-group">
                                 <div class="input-append">
-                                    <input type="text" id="font-size" value="13" disabled="disabled">
-                                    <button class="btn" id="font-size-bigger">+</button>
-                                    <button class="btn" id="font-size-smaller">-</button>
-                                    <span class="help-inline">px</span>
+                                    <input type="text" id="font-size" value="13" disabled="disabled"><button class="btn" id="font-size-bigger">+</button><button class="btn" id="font-size-smaller">-</button>
                                 </div>
+                                <span class="help-inline">px</span>
                             </div>
                             <button class="btn btn-info" id="pause-button" data-paused="0">
                                 <i id="pause-icon" class="icon-pause"></i>
