@@ -94,4 +94,8 @@ You're welcome! Make a pull request and we'll see.
 
 * [Ian Babrou](https://github.com/bobrik)
 
+## Contributors
+
+* [Artyom Kohver](https://github.com/kohver)
+
 Inspired by [supergrep](https://github.com/etsy/supergrep) from Etsy.
