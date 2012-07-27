@@ -79,12 +79,12 @@
                                 <span class="help-inline">buffer lines</span>
                             </div>
                             <div class="control-group">
-                                <input type="text" id="highlight-items" placeholder="^web (press enter to apply)" />
-                                <span class="help-inline">highlight lines</span>
+                                <input type="text" id="highlight-items" placeholder="FATAL (press enter to apply)" />
+                                <span class="help-inline">highlight (and)</span>
                             </div>
                             <div class="control-group">
                                 <input type="text" id="grep-items" placeholder="^web (press enter to apply)" />
-                                <span class="help-inline">grep lines</span>
+                                <span class="help-inline">grep lines (or)</span>
                             </div>
                             <div class="control-group">
                                 <div class="input-append">
@@ -394,8 +394,8 @@
                         if (tags && tags.length) {
                             for (var i in tags) {
                                 var tag = tags[i];
-                                if (tag && text.match(new RegExp(tag))) {
-                                    return true;
+                                if (tag && !text.match(new RegExp(tag))) {
+                                    return false;
                                 }
                             }
                         }
@@ -403,7 +403,7 @@
                         console.log(e);
                     }
 
-                    return false;
+                    return true;
                 }
 
 
