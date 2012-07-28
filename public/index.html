@@ -470,15 +470,10 @@
                 });
 
                 socket.on("connect", function() {
-//                    socket.emit("subscribe", {path: "/tmp/pew"});
                     console.log("connected!");
                 });
 
                 window.scrollTo(0, 1);
-
-                if (navigator.userAgent.match(/iPad/i)) {
-                    taggedInputs.prop("placeholder", "");
-                }
             });
         </script>
     </body>
