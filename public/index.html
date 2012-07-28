@@ -109,7 +109,9 @@
                         <ul class="nav nav-list" id="logs-list">
                             <li class="nav-header">Logs</li>
                             <li>
-                                <input type="text" id="log-name-filter" placeholder="Filter logs by name regexp.." />
+                                <div class="control-group">
+                                    <input type="text" id="log-name-filter" placeholder="Filter logs by name regexp.." />
+                                </div>
                             </li>
                         </ul>
                     </div>
@@ -224,24 +226,29 @@
                 });
 
                 logNameFilter.change(function() {
+                    var regexp;
+
                     try {
-                        var regexp = new RegExp(logNameFilter.val(), "i");
-                        logsList.each(function(index, node) {
-                            // slow piece of shit
-                            var element = jQuery(node);
-                            if (element.data("log-name").match(regexp)) {
-                                if (element.is(':hidden')) {
-                                    element.show()
-                                }
-                            } else {
-                                if (!element.is(":hidden")) {
-                                    element.hide();
-                                }
-                            }
-                        });
+                        regexp = new RegExp(logNameFilter.val(), "i");
+                        jQuery(this).parent().removeClass("error")
                     } catch (e) {
-                        console.log(e);
+                        jQuery(this).parent().addClass("error");
+                        return;
                     }
+
+                    logsList.each(function(index, node) {
+                        // slow piece of shit
+                        var element = jQuery(node);
+                        if (element.data("log-name").match(regexp)) {
+                            if (element.is(':hidden')) {
+                                element.show()
+                            }
+                        } else {
+                            if (!element.is(":hidden")) {
+                                element.hide();
+                            }
+                        }
+                    });
 
                     rebuildCurrentLink();
                 });
