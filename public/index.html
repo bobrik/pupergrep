@@ -137,6 +137,7 @@
                     logNameFilter     = jQuery("#log-name-filter"),
                     fontSizeSelector  = jQuery("#font-size"),
                     currentLink       = jQuery("#current-link"),
+                    taggedInputs      = jQuery('#highlight-items, #grep-items'),
                     currentLog        = undefined,
                     bufferLength      = 20,
                     outputPaused      = false,
@@ -213,12 +214,32 @@
                     fontSizeSelector.val(+fontSizeSelector.val() - 1).change();
                 });
 
-                jQuery('#highlight-items, #grep-items').textext({ plugins : 'tags' });
-                jQuery('#highlight-items, #grep-items').textext()[0].getFormData();
-                jQuery('#highlight-items, #grep-items').bind('setFormData', function(e, data, isEmpty) {
+                taggedInputs.textext({ plugins : 'tags' });
+                taggedInputs.textext()[0].getFormData();
+                taggedInputs.bind('isTagAllowed', function(e, data) {
+                    try {
+                        new RegExp(data.tag);
+                    } catch (e) {
+                        data.result = false;
+                    }
+                });
+                taggedInputs.bind('setFormData', function(e, data, isEmpty) {
                     var $target = jQuery(e.target);
                     $target.data('tags', data);
                     rebuildCurrentLink();
+                });
+
+
+                taggedInputs.keyup(function() {
+                    var input     = jQuery(this),
+                        container = input.parent().parent().parent();
+
+                    try {
+                        new RegExp(input.val());
+                        container.removeClass("error");
+                    } catch (e) {
+                        container.addClass("error");
+                    }
                 });
 
                 logNameFilter.keyup(function() {
@@ -374,17 +395,14 @@
 
                 function isHighlightedLine(text) {
                     var tags = jQuery("#highlight-items").data('tags');
-                    try {
-                        if (tags && tags.length) {
-                            for (var i in tags) {
-                                var tag = tags[i];
-                                if (tag && text.match(new RegExp(tag))) {
-                                    return true;
-                                }
+
+                    if (tags && tags.length) {
+                        for (var i in tags) {
+                            var tag = tags[i];
+                            if (tag && text.match(new RegExp(tag))) {
+                                return true;
                             }
                         }
-                    } catch (e) {
-                        console.log(e);
                     }
 
                     return false;
@@ -397,22 +415,18 @@
 
                 function isGrepAcceptedLine(text) {
                     var tags = jQuery("#grep-items").data('tags');
-                    try {
-                        if (tags && tags.length) {
-                            for (var i in tags) {
-                                var tag = tags[i];
-                                if (tag && !text.match(new RegExp(tag))) {
-                                    return false;
-                                }
+
+                    if (tags && tags.length) {
+                        for (var i in tags) {
+                            var tag = tags[i];
+                            if (tag && !text.match(new RegExp(tag))) {
+                                return false;
                             }
                         }
-                    } catch (e) {
-                        console.log(e);
                     }
 
                     return true;
                 }
-
 
                 socket.on("line", function(data) {
                     if (outputPaused) {
