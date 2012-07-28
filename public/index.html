@@ -337,10 +337,10 @@
                     if (log) {
                         currentLog = log;
                     }
-                    if (grepJoin != grepJoinType.data("join-type")) {
+                    if (grepJoin && grepJoin != grepJoinType.data("join-type")) {
                         grepJoinType.click();
                     }
-                    if (highlightJoin != highlightJoinType.data("join-type")) {
+                    if (highlightJoin && highlightJoin != highlightJoinType.data("join-type")) {
                         highlightJoinType.click();
                     }
                 })();
