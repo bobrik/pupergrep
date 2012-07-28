@@ -4,10 +4,11 @@
 
 Everybody loves screenshots!
 
-![screenshot](http://bobrik.name/uploads/pupergrep-new-screenshot.png)
+![screenshot](http://i.imgur.com/Xl3yf.png)
 
 * Grep only lines you like (skip non-fatal errors, stack traces, INFO lines).
 * Highlight only lines you dislike (FATAL errors, long responses).
+* Group highlight and grep conditions with AND/OR;
 * Limit output buffer to keep the whole log area on the screen or make it large to see everthing.
 * Pause log to take a look for fun facts in your error log.
 * Fast switching between many logs with handsome list with search box.
