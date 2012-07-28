@@ -80,11 +80,11 @@
                             </div>
                             <div class="control-group">
                                 <input type="text" id="highlight-items" placeholder="FATAL (press enter to apply)" />
-                                <span class="help-inline">highlight (or)</span>
+                                <span class="help-inline">highlight <a href="#" data-join-type="or" id="highlight-join-type" class="join-type label">or</a></span>
                             </div>
                             <div class="control-group">
                                 <input type="text" id="grep-items" placeholder="^web (press enter to apply)" />
-                                <span class="help-inline">grep (and)</span>
+                                <span class="help-inline">grep <a href="#" data-join-type="and" id="grep-join-type" class="join-type label">and</a></span>
                             </div>
                             <div class="control-group">
                                 <div class="input-append">
@@ -138,6 +138,9 @@
                     fontSizeSelector  = jQuery("#font-size"),
                     currentLink       = jQuery("#current-link"),
                     taggedInputs      = jQuery('#highlight-items, #grep-items'),
+                    joinTypes         = jQuery(".join-type"),
+                    grepJoinType      = jQuery("#grep-join-type"),
+                    highlightJoinType = jQuery("#highlight-join-type"),
                     currentLog        = undefined,
                     bufferLength      = 20,
                     outputPaused      = false,
@@ -172,6 +175,8 @@
                         url += "&grep=" + encodeURIComponent(jQuery("#grep-items").data('tags').join(linkSeparator));
                     url += "&name-filter=" + encodeURIComponent(jQuery("#log-name-filter").val());
                     url += "&font-size=" + fontSizeSelector.val();
+                    url += "&highligh-join=" + highlightJoinType.data("join-type");
+                    url += "&grep-join=" + grepJoinType.data("join-type");
 
                     if (currentLog) {
                         url += "&log=" + currentLog;
@@ -212,6 +217,15 @@
 
                 jQuery("#font-size-smaller").click(function() {
                     fontSizeSelector.val(+fontSizeSelector.val() - 1).change();
+                });
+
+                joinTypes.click(function() {
+                    var trigger = jQuery(this),
+                        type    = trigger.data("join-type") == "or" ? "and" : "or";
+
+                    trigger.data("join-type", type).text(type);
+                    rebuildCurrentLink();
+                    return false;
                 });
 
                 taggedInputs.textext({ plugins : 'tags' });
@@ -296,12 +310,14 @@
                         return value !== null ? decodeURIComponent(value) : value;
                     }
 
-                    var buffer     = getURLParameter("buffer"),
-                        log        = getURLParameter("log"),
-                        highlight  = getURLParameter("highlight"),
-                        grep       = getURLParameter("grep"),
-                        nameFilter = getURLParameter("name-filter"),
-                        fontSize   = getURLParameter("font-size");
+                    var buffer        = getURLParameter("buffer"),
+                        log           = getURLParameter("log"),
+                        highlight     = getURLParameter("highlight"),
+                        grep          = getURLParameter("grep"),
+                        nameFilter    = getURLParameter("name-filter"),
+                        fontSize      = getURLParameter("font-size"),
+                        grepJoin      = getURLParameter("grep-join"),
+                        highlightJoin = getURLParameter("highligh-join");
 
                     if (buffer) {
                         jQuery("#buffer-length").val(buffer).change();
@@ -320,6 +336,12 @@
                     }
                     if (log) {
                         currentLog = log;
+                    }
+                    if (grepJoin != grepJoinType.data("join-type")) {
+                        grepJoinType.click();
+                    }
+                    if (highlightJoin != highlightJoinType.data("join-type")) {
+                        highlightJoinType.click();
                     }
                 })();
 
@@ -368,10 +390,8 @@
 
                     line.text(text);
 
-                    if (isGrepEnabled()) {
-                        if (!isGrepAcceptedLine(text)) {
-                            return;
-                        }
+                    if (!isGrepAcceptedLine(text)) {
+                        return;
                     }
 
                     if (isHighlightedLine(text)) {
@@ -393,39 +413,40 @@
                     }
                 }
 
-                function isHighlightedLine(text) {
-                    var tags = jQuery("#highlight-items").data('tags');
+                // type must be "or" or any other string for "and"
+                function isAcceptedByConditionsJoinType(value, conditions, type) {
+                    var condition;
 
-                    if (tags && tags.length) {
-                        for (var i in tags) {
-                            var tag = tags[i];
-                            if (tag && text.match(new RegExp(tag))) {
-                                return true;
+                    if (conditions && conditions.length) {
+                        for (var i in conditions) {
+                            condition = conditions[i];
+                            if (condition) {
+                                if ((type == "or") == !!value.match(new RegExp(condition))) {
+                                    return type == "or";
+                                }
                             }
                         }
                     }
 
-                    return false;
+                    return type != "or";
                 }
 
-                function isGrepEnabled() {
-                    var value = jQuery("#grep-items").data('tags');
-                    return !!(value && value.length);
+                function isHighlightedLine(text) {
+                    var conditions = jQuery("#highlight-items").data('tags'),
+                        type       = highlightJoinType.data("join-type");
+
+                    if (!conditions || conditions.length == 0) {
+                        return false;
+                    }
+
+                    return isAcceptedByConditionsJoinType(text, conditions, type);
                 }
 
                 function isGrepAcceptedLine(text) {
-                    var tags = jQuery("#grep-items").data('tags');
+                    var conditions = jQuery("#grep-items").data('tags'),
+                            type   = grepJoinType.data("join-type");
 
-                    if (tags && tags.length) {
-                        for (var i in tags) {
-                            var tag = tags[i];
-                            if (tag && !text.match(new RegExp(tag))) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
+                    return isAcceptedByConditionsJoinType(text, conditions, type);
                 }
 
                 socket.on("line", function(data) {
