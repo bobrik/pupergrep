@@ -18,7 +18,7 @@
             }
 
             .pupergrep-settings-form input {
-                width: 200px;
+                width: 190px;
                 height: auto;
                 -webkit-box-sizing: border-box;
                 -moz-box-sizing: border-box;
@@ -50,6 +50,14 @@
             #logs-list li.log {
                 cursor: pointer;
             }
+
+            input#log-name-filter {
+                width: 180px;
+            }
+
+            .right-settings-help {
+                width: 90px;
+            }
         </style>
         <link href="css/bootstrap-responsive.css" rel="stylesheet">
     </head>
@@ -76,15 +84,15 @@
                             <h3>Settings</h3>
                             <div class="control-group">
                                 <input type="text" id="buffer-length" value="20" />
-                                <span class="help-inline">buffer lines</span>
+                                <span class="help-inline right-settings-help">buffer lines</span>
                             </div>
                             <div class="control-group">
                                 <input type="text" id="highlight-items" placeholder="FATAL (press enter to apply)" />
-                                <span class="help-inline">highlight <a href="#" data-join-type="or" id="highlight-join-type" class="join-type label">or</a></span>
+                                <span class="help-inline right-settings-help">highlight <a href="#" data-join-type="or" id="highlight-join-type" class="join-type label">or</a></span>
                             </div>
                             <div class="control-group">
                                 <input type="text" id="grep-items" placeholder="^web (press enter to apply)" />
-                                <span class="help-inline">grep <a href="#" data-join-type="and" id="grep-join-type" class="join-type label">and</a></span>
+                                <span class="help-inline right-settings-help">grep <a href="#" data-join-type="and" id="grep-join-type" class="join-type label">and</a></span>
                             </div>
                             <div class="control-group">
                                 <div class="input-append">
