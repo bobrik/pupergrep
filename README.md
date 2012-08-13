@@ -14,6 +14,7 @@ Everybody loves screenshots!
 * Fast switching between many logs with handsome list with search box.
 * Font-size switching for eagles.
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
+* Link activation in logs - just click on it to open.
 * Open-source. Can you imagine that?
 
 ## Demo
