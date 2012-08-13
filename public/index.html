@@ -396,7 +396,14 @@
                     container = jQuery("<tr>");
                     line      = jQuery("<td>");
 
-                    line.text(text);
+                    // escaping html
+                    text = text.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;");
+                    // making some links
+                    text = text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+                        return '<a href="' + url + '">' + url + '</a>';
+                    });
+
+                    line.html(text);
 
                     if (!isGrepAcceptedLine(text)) {
                         return;
