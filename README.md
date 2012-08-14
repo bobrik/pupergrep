@@ -15,6 +15,7 @@ Everybody loves screenshots!
 * Font-size switching for eagles.
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Link activation in logs - just click on it to open.
+* Whole system and current log activity state indication.
 * Open-source. Can you imagine that?
 
 ## Demo
