@@ -413,14 +413,15 @@
                 });
 
                 function addLogLine(text, isRaw) {
-                    var lines,
+                    var logHeart = activeLogHeart,
+                        lines,
                         container,
                         line;
 
                     if (!logHighlighting) {
                         logHighlighting = true;
-                        activeLogHeart.fadeIn("slow", function() {
-                            activeLogHeart.fadeOut("slow", function() {
+                        logHeart.fadeIn("slow", function() {
+                            logHeart.fadeOut("slow", function() {
                                 setTimeout(function() {
                                     logHighlighting = false;
                                 }, 500);
