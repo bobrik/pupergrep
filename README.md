@@ -61,7 +61,11 @@ Save it to `~/mypupergrep/server.js`. Run it right after that:
 node server.js
 ```
 
-Let's configure nginx (I don't want to make node.js serve static files). Example configuration:
+Now cross your fingers and open `http://127.0.0.1:8080/` in your favorite browser. This is it!
+
+## Nginx configuration (optional)
+
+If you want nginx in front of your logs for security or whatever, this is example config:
 
 ```
 server {
@@ -80,7 +84,8 @@ server {
 }
 ```
 
-Now cross your fingers and open `http://127.0.0.1/` in your favorite browser. This is it!
+This way you may open `http://127.0.0.1/` and enjoy your logs. Note that nginx does not support
+websockets yet and you'll need to wait for 2 seconds to switch from ws to xhr-polling.
 
 ## Troubles
 
