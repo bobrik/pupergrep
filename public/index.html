@@ -326,8 +326,15 @@
 
                     rebuildCurrentLink();
 
-                    activeLogHeart.hide();
+
                     activeLogHeart = logsListContainer.find("li.log.active .heart");
+                    logsList.each(function(index, node) {
+                        var element = jQuery(node);
+
+                        if (!element.hasClass("active")) {
+                            element.children(".heart").hide();
+                        }
+                    });
                     setTimeout(function() {
                         logHighlighting = false;
                     }, 1000);
