@@ -138,6 +138,21 @@
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             jQuery(document).ready(function() {
+                var KEY = window.KEY = {
+                    LEFT: 37,
+                    UP: 38,
+                    RIGHT: 39,
+                    DOWN: 40,
+                    DEL: 8,
+                    TAB: 9,
+                    RETURN: 13,
+                    ENTER: 13,
+                    ESC: 27,
+                    PAGEUP: 33,
+                    PAGEDOWN: 34,
+                    SPACE: 32
+                };
+
                 var logLinesTable     = jQuery("#log-lines"),
                     logsListContainer = jQuery("#logs-list"),
                     logsList          = jQuery(),
@@ -152,6 +167,7 @@
                     currentLog        = undefined,
                     bufferLength      = 20,
                     outputPaused      = false,
+                    mouseDowned       = false,
                     linkSeparator     = '!!!';
 
                 pauseButton.click(function() {
@@ -310,6 +326,27 @@
                     currentLog = element.data("log-name");
 
                     rebuildCurrentLink();
+                });
+
+                jQuery(window).keydown(function(e) {
+                    if (e.keyCode == KEY.SPACE) {
+                        pauseButton.click();
+                        return false;
+                    }
+                });
+
+                logLinesTable.mousedown(function() {
+                    if (!outputPaused) {
+                        outputPaused = true;
+                        mouseDowned = true;
+                    }
+                });
+
+                logLinesTable.mouseup(function() {
+                    if (mouseDowned) {
+                        outputPaused = false;
+                        mouseDowned = false;
+                    }
                 });
 
                 (function initFromURI() {
