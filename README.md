@@ -16,6 +16,7 @@ Everybody loves screenshots!
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Link activation in logs - just click on it to open.
 * Whole system and current log activity state indication.
+* Support for plain text and html logs.
 * Open-source. Can you imagine that?
 
 ## Demo
@@ -50,6 +51,9 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
             console.log("Error adding test log", error);
             return;
         }
+
+        // if your log may be interpreted as html:
+        // manager.setLogType("my_cool_log", "html");
 
         puper.listen(8080, "127.0.0.1");
     });
