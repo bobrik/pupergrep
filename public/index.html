@@ -329,7 +329,7 @@
                 });
 
                 jQuery(window).keydown(function(e) {
-                    if (e.keyCode == KEY.SPACE) {
+                    if (e.keyCode == KEY.SPACE && e.target == jQuery('body')[0]) {
                         pauseButton.click();
                         return false;
                     }
