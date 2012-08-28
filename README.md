@@ -10,7 +10,7 @@ Everybody loves screenshots!
 * Highlight only lines you dislike (FATAL errors, long responses).
 * Group highlight and grep conditions with AND/OR;
 * Limit output buffer to keep the whole log area on the screen or make it large to see everthing.
-* Pause log to take a look for fun facts in your error log.
+* Pause log with button, hotkey (space) or hold mouse button on logs to take a look for fun facts in your error log.
 * Fast switching between many logs with handsome list with search box.
 * Font-size switching for eagles.
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
