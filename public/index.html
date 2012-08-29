@@ -70,6 +70,11 @@
             li.log .heart {
                 margin-left: 5px;
             }
+
+            .table-striped tbody tr:nth-child(odd) td,
+            .table-striped tbody tr:nth-child(odd) th {
+                background-color: transparent;
+            }
         </style>
         <link href="css/bootstrap-responsive.css" rel="stylesheet">
     </head>
@@ -511,14 +516,22 @@
 
                     logLinesTable.append(container);
 
-                    while (true) {
+                    (function clearLog() {
                         lines = logLinesTable.find("tr.log-line");
                         if (lines.length > bufferLength) {
-                            lines.first().remove();
-                        } else {
-                            break;
+                            var line = lines.first();
+                            if ((lines.length - bufferLength) > 1) {
+                                line.remove();
+                                clearLog();
+                            } else {
+                                logLinesTable.css({marginBottom: line.height()}).stop(true, true).animate({marginTop: -line.height()}, 100, function() {
+                                    line.remove();
+                                    logLinesTable.css({marginTop: 0});
+                                    clearLog();
+                                });
+                            }
                         }
-                    }
+                    })();
                 }
 
                 // type must be "or" or any other string for "and"
