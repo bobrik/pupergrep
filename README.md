@@ -54,6 +54,8 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
 
         // if your log may be interpreted as html:
         // manager.setLogType("my_cool_log", "html");
+        // or has ANSI escape sequences
+        // manager.setLogType("my_cool_log", "ansi");
 
         puper.listen(8080, "127.0.0.1");
     });
