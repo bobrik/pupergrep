@@ -18,7 +18,7 @@
             }
 
             .pupergrep-settings-form input {
-                width: 190px;
+                width: 180px;
                 height: auto;
                 -webkit-box-sizing: border-box;
                 -moz-box-sizing: border-box;
@@ -59,6 +59,18 @@
                 width: 90px;
             }
 
+            .pause-button-help {
+                width: 175px;
+            }
+
+            #health-icon {
+                margin: 5px 0 0 5px;
+            }
+
+            li.log .heart {
+                margin-left: 5px;
+            }
+
             .table-striped tbody tr:nth-child(odd) td,
             .table-striped tbody tr:nth-child(odd) th {
                 background-color: transparent;
@@ -86,7 +98,7 @@
                 <div class="span3">
                     <div class="well sidebar-nav">
                         <div class="nav-list form-horizontal pupergrep-settings-form">
-                            <h3>Settings</h3>
+                            <h3>Settings<i class="icon-ban-circle" id="health-icon"></i></h3>
                             <div class="control-group">
                                 <input type="text" id="buffer-length" value="20" />
                                 <span class="help-inline right-settings-help">buffer lines</span>
@@ -109,6 +121,7 @@
                                 <i id="pause-icon" class="icon-pause"></i>
                                 <span id="pause-text">Pause</span>
                             </button>
+                            <span class="help-inline pause-button-help">Select text or press space.</span>
                         </div>
                     </div>
                     <div>
@@ -169,7 +182,13 @@
                     joinTypes         = jQuery(".join-type"),
                     grepJoinType      = jQuery("#grep-join-type"),
                     highlightJoinType = jQuery("#highlight-join-type"),
+                    healthIcon        = jQuery("#health-icon"),
+                    activeLogHeart    = logsListContainer.find("li.log.active .heart"),
+                    logHighlighting   = false,
+                    connected         = false,
+                    healthIconTimer   = undefined,
                     currentLog        = undefined,
+                    currentLogType    = undefined,
                     bufferLength      = 20,
                     outputPaused      = false,
                     mouseDowned       = false,
@@ -320,6 +339,8 @@
                 logsListContainer.delegate("li.log", "click", function() {
                     var element = jQuery(this);
 
+                    logHighlighting = true;
+
                     logLinesTable.find("tr.log-line").remove();
                     logsListContainer.children("li.log").removeClass("active");
 
@@ -328,9 +349,23 @@
                         name: element.data("log-name")
                     });
 
-                    currentLog = element.data("log-name");
+                    currentLog     = element.data("log-name");
+                    currentLogType = element.data("log-type");
 
                     rebuildCurrentLink();
+
+                    activeLogHeart = logsListContainer.find("li.log.active .heart");
+                    logsList.each(function(index, node) {
+                        var element = jQuery(node);
+
+                        if (!element.hasClass("active")) {
+                            element.find(".heart").hide();
+                        }
+                    });
+
+                    setTimeout(function() {
+                        logHighlighting = false;
+                    }, 1000);
                 });
 
                 jQuery(window).keydown(function(e) {
@@ -396,7 +431,8 @@
                 })();
 
                 var socket = io.connect(document.location.hostname, {
-                    transports: ['xhr-polling'] // bad, bad nginx!
+                    "transports"      : ['websocket', 'xhr-polling'], // bad, bad nginx!
+                    "connect timeout" : 2000 // timeout for switching from websocket to xhr-polling
                 });
 
                 socket.on("logs", function(data) {
@@ -404,18 +440,22 @@
 
                     logsListContainer.children(".log").remove();
 
-                    jQuery(data.logs).each(function(index, name) {
+                    jQuery(data.logs).each(function(index, log) {
                         var container = jQuery("<li>"),
-                            log       = jQuery("<a>");
+                            link      = jQuery("<a>"),
+                            heart     = jQuery("<i>");
 
-                        log.text(name);
-                        container.data("log-name", name);
+                        heart.addClass("icon-heart").addClass("heart").hide();
+                        link.text(log.name);
+                        link.append(heart);
+                        container.data("log-name", log.name);
+                        container.data("log-type", log.type);
                         container.addClass("log");
-                        container.append(log);
+                        container.append(link);
 
                         logsListContainer.append(container);
 
-                        if (name == currentLog) {
+                        if (log.name == currentLog) {
                             selectLog = container;
                         }
                     });
@@ -431,21 +471,37 @@
                 });
 
                 function addLogLine(text, isRaw) {
-                    var lines,
+                    var logHeart = activeLogHeart,
+                        lines,
                         container,
                         line;
+
+                    if (!logHighlighting) {
+                        logHighlighting = true;
+                        logHeart.fadeIn("slow", function() {
+                            logHeart.fadeOut("slow", function() {
+                                setTimeout(function() {
+                                    logHighlighting = false;
+                                }, 500);
+                            });
+                        });
+                    }
 
                     container = jQuery("<tr>");
                     line      = jQuery("<td>");
 
-                    // escaping html
-                    text = text.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;");
-                    // making some links
-                    text = text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
-                        return '<a href="' + url + '">' + url + '</a>';
-                    });
+                    if (currentLogType == "html") {
+                        line.html(text);
+                    } else {
+                        // escaping html
+                        text = text.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;");
+                        // making some links
+                        text = text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+                            return '<a href="' + url + '">' + url + '</a>';
+                        });
 
-                    line.html(text);
+                        line.html(text);
+                    }
 
                     if (!isGrepAcceptedLine(text)) {
                         return;
@@ -523,11 +579,35 @@
                 });
 
                 socket.on("disconnect", function() {
-                    console.log("got disconnect!");
+                    connected = false;
+
+                    healthIcon.removeClass("icon-ok-circle")
+                              .addClass("icon-ban-circle")
+                              .prop("title", "Connection failed");
+
+                    (function animateDisconnect() {
+                        healthIcon.fadeOut("slow", function() {
+                            healthIcon.fadeIn("slow", function() {
+                                if (!connected) {
+                                    healthIconTimer = setTimeout(animateDisconnect, 500);
+                                }
+                            });
+                        });
+                    })();
+
                 });
 
                 socket.on("connect", function() {
-                    console.log("connected!");
+                    connected = true;
+
+                    if (healthIconTimer) {
+                        clearTimeout(healthIconTimer);
+                        healthIconTimer = undefined;
+                    }
+
+                    healthIcon.removeClass("icon-ban-circle")
+                              .addClass("icon-ok-circle")
+                              .prop("title", "Connected");
                 });
 
                 window.scrollTo(0, 1);
