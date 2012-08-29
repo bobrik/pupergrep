@@ -10,11 +10,13 @@ Everybody loves screenshots!
 * Highlight only lines you dislike (FATAL errors, long responses).
 * Group highlight and grep conditions with AND/OR;
 * Limit output buffer to keep the whole log area on the screen or make it large to see everthing.
-* Pause log to take a look for fun facts in your error log.
+* Pause log with button, hotkey (space) or hold mouse button on logs to take a look for fun facts in your error log.
 * Fast switching between many logs with handsome list with search box.
 * Font-size switching for eagles.
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Link activation in logs - just click on it to open.
+* Whole system and current log activity state indication.
+* Support for plain text and html logs.
 * Open-source. Can you imagine that?
 
 ## Demo
@@ -50,6 +52,9 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
             return;
         }
 
+        // if your log may be interpreted as html:
+        // manager.setLogType("my_cool_log", "html");
+
         puper.listen(8080, "127.0.0.1");
     });
 })();
@@ -61,7 +66,11 @@ Save it to `~/mypupergrep/server.js`. Run it right after that:
 node server.js
 ```
 
-Let's configure nginx (I don't want to make node.js serve static files). Example configuration:
+Now cross your fingers and open `http://127.0.0.1:8080/` in your favorite browser. This is it!
+
+## Nginx configuration (optional)
+
+If you want nginx in front of your logs for security or whatever, this is example config:
 
 ```
 server {
@@ -80,7 +89,8 @@ server {
 }
 ```
 
-Now cross your fingers and open `http://127.0.0.1/` in your favorite browser. This is it!
+This way you may open `http://127.0.0.1/` and enjoy your logs. Note that nginx does not support
+websockets yet and you'll need to wait for 2 seconds to switch from ws to xhr-polling.
 
 ## Troubles
 
