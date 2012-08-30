@@ -16,7 +16,7 @@ Everybody loves screenshots!
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Link activation in logs - just click on it to open.
 * Whole system and current log activity state indication.
-* Support for plain text and html logs.
+* Support for plain text, html and color ansi (yep, like in your terminal) logs.
 * Open-source. Can you imagine that?
 
 ## Demo
@@ -111,5 +111,6 @@ You're welcome! Make a pull request and we'll see.
 ## Contributors
 
 * [Artyom Kohver](https://github.com/kohver)
+* [Max Riveiro](https://github.com/kavu)
 
 Inspired by [supergrep](https://github.com/etsy/supergrep) from Etsy.
