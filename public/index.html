@@ -153,6 +153,7 @@
 
         <script type="text/javascript" src="/js/jquery.js"></script>
         <script type="text/javascript" src="/js/jquery.textext.js"></script>
+        <script type="text/javascript" src="/js/jquery.colorizeConsoleOutput.js"></script>
         <script type="text/javascript" src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             jQuery(document).ready(function() {
@@ -501,6 +502,10 @@
                         });
 
                         line.html(text);
+                    }
+
+                    if (currentLogType == "ansi") {
+                        line.colorizeConsoleOutput();
                     }
 
                     if (!isGrepAcceptedLine(text)) {

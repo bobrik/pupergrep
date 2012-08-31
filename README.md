@@ -16,7 +16,8 @@ Everybody loves screenshots!
 * Send your colleagues links to your favorite logs with your settings and bookmark them.
 * Link activation in logs - just click on it to open.
 * Whole system and current log activity state indication.
-* Support for plain text and html logs.
+* Support for plain text, html and color ansi (yep, like in your terminal) logs.
+* Custom filters for log lines before outputting. Colorize if you want to.
 * Open-source. Can you imagine that?
 
 ## Demo
@@ -54,6 +55,20 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
 
         // if your log may be interpreted as html:
         // manager.setLogType("my_cool_log", "html");
+        // or has ANSI escape sequences
+        // manager.setLogType("my_cool_log", "ansi");
+
+        // if you want to colorize your log before outputting as html:
+        // manager.getLogReader("my_cool_log", function(error, reader) {
+        //     if (error) {
+        //         console.log(error);
+        //         return;
+        //     }
+        //
+        //     reader.setProcessor(function(line, callback) {
+        //         callback(undefined, "<span style="color: red;>" + line + "</span>");
+        //     });
+        // });
 
         puper.listen(8080, "127.0.0.1");
     });
@@ -109,5 +124,6 @@ You're welcome! Make a pull request and we'll see.
 ## Contributors
 
 * [Artyom Kohver](https://github.com/kohver)
+* [Max Riveiro](https://github.com/kavu)
 
 Inspired by [supergrep](https://github.com/etsy/supergrep) from Etsy.
