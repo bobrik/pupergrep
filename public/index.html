@@ -492,9 +492,7 @@
                         // escaping html
                         text = text.split("&").join("&amp;").split( "<").join("&lt;").split(">").join("&gt;");
                         // making some links
-                        text = text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
-                            return '<a href="' + url + '">' + url + '</a>';
-                        });
+                        text = linkUrls(text);
 
                         line.html(text);
                     }
@@ -604,6 +602,24 @@
 
                 window.scrollTo(0, 1);
             });
+
+            function linkUrls(text) {
+                var urlRegex = /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#!]*[\w\-\@?^=%&amp;\/~\+#!])?/;
+                var output = '';
+              
+                var match = text.match(urlRegex);
+              
+                while (match) {
+                    output += text.substr(0, match.index);
+                    output += '<a href="' + match[0] + '" target="_blank">' + match[0] + '</a>';
+                    
+                    text = text.substr(match.index + match[0].length);
+                    match = text.match(urlRegex);
+                }
+              
+                output += text;
+                return output;
+            }
         </script>
     </body>
 </html>
