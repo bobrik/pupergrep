@@ -285,6 +285,16 @@
                     var $target = jQuery(e.target);
                     $target.data('tags', data);
                     rebuildCurrentLink();
+                    
+                    // Apply highlighting to existing log lines
+                    $('.log-line').each(function(i, line) {
+                        var $line = jQuery(line);
+                        if (isHighlightedLine($line.text())) {
+                            $line.addClass("alert");
+                        } else {
+                            $line.removeClass("alert");
+                        }
+                    });
                 });
 
 
