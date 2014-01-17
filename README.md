@@ -44,33 +44,16 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
 ```javascript
 (function() {
     var PuperGrep = require("pupergrep"),
-        puper     = new PuperGrep(),
-        manager   = puper.getLogReaderManager();
+        puper     = new PuperGrep();
 
-    manager.addLog("my_cool_log", "/var/log/my_cool_log", function(error) {
-        if (error) {
-            console.log("Error adding test log", error);
-            return;
-        }
+    // if your log has ANSI escape sequences (default):
+    puper.add("/var/log/my_cool_log", "ansi");
+    // or it may be interpreted as html
+    puper.add("/var/log/my_cool_log", "html");
 
-        // if your log may be interpreted as html:
-        // manager.setLogType("my_cool_log", "html");
-        // or has ANSI escape sequences
-        // manager.setLogType("my_cool_log", "ansi");
-
-        // if you want to colorize your log before outputting as html:
-        // manager.getLogReader("my_cool_log", function(error, reader) {
-        //     if (error) {
-        //         console.log(error);
-        //         return;
-        //     }
-        //
-        //     reader.setProcessor(function(line, callback) {
-        //         callback(undefined, "<span style="color: red;>" + line + "</span>");
-        //     });
-        // });
-
-        puper.listen(8080, "127.0.0.1");
+    // if you want to colorize (decorate) your log before outputting as html:
+    puper.add("/var/log/my_cool_log", "html", function(line, callback) {
+        callback(undefined, "<span style='color: red;'>" + line + "</span>");
     });
 })();
 ```
