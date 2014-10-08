@@ -286,9 +286,15 @@
                     $target.data('tags', data);
                     rebuildCurrentLink();
                     
-                    // Apply highlighting to existing log lines
+                    // Apply grep and highlighting to existing log lines
                     $('.log-line').each(function(i, line) {
                         var $line = jQuery(line);
+                        if (!isGrepAcceptedLine($line.text())) {
+                            $line.hide();
+                            return;
+                        } else {
+                            $line.show();
+                        }
                         if (isHighlightedLine($line.text())) {
                             $line.addClass("alert");
                         } else {
