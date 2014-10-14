@@ -20,12 +20,6 @@ Everybody loves screenshots!
 * Custom filters for log lines before outputting. Colorize if you want to.
 * Open-source. Can you imagine that?
 
-## Demo
-
-Yes, we have it, right here: [http://home.bobrik.name/](http://home.bobrik.name/). Feel free to touch it before using!
-
-Select log you like and try to push some buttons.
-
 ## Installation
 
 This is pretty simple, believe me!
@@ -47,14 +41,16 @@ PuperGrep needs to know what to monitor. Simple server to make you understand wh
         puper     = new PuperGrep();
 
     // if your log has ANSI escape sequences (default):
-    puper.add("/var/log/my_cool_log", "ansi");
+    puper.add("my_ansi_log", "/var/log/my_cool_log", "ansi");
     // or it may be interpreted as html
-    puper.add("/var/log/my_cool_log", "html");
+    puper.add("my_html_log", "/var/log/my_cool_log", "html");
 
     // if you want to colorize (decorate) your log before outputting as html:
-    puper.add("/var/log/my_cool_log", "html", function(line, callback) {
+    puper.add("fancy_log", "/var/log/my_cool_log", "html", function(line, callback) {
         callback(undefined, "<span style='color: red;'>" + line + "</span>");
     });
+
+    puper.listen(8080, "127.0.0.1");
 })();
 ```
 
