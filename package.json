@@ -1,11 +1,11 @@
 {
   "name": "pupergrep",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "description": "Real-time grep for your logs right in your favorite modern browser made with Twitter Bootstrap.",
   "main": "index.js",
   "dependencies": {
-    "socket.io": ">=0.9.6",
-    "send": ">=0.0.3"
+    "socket.io": "0.9.6",
+    "send": "0.0.3"
   },
   "devDependencies": {},
   "repository": {
