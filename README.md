@@ -24,10 +24,7 @@ Everybody loves screenshots!
 
 This is pretty simple, believe me!
 
-```
-mkdir ~/mypupergrep
-cd ~/mypupergrep
-mkdir node_modules
+```sh
 npm install pupergrep
 ```
 
